@@ -59,33 +59,34 @@ bool FeatureManager::addFeatureCheckParallax(int frame_count, const map<int, vec
     last_average_parallax = 0;
     new_feature_num = 0;
     long_track_num = 0;
-    for (auto &id_pts : image)
+    for (auto &id_pts : image)  // every feature tracked in image
     {
-        FeaturePerFrame f_per_fra(id_pts.second[0].second, td);
+        FeaturePerFrame f_per_fra(id_pts.second[0].second, td); // xyz_uv_vel, time offset 
         assert(id_pts.second[0].first == 0);
-        if(id_pts.second.size() == 2)
+        if(id_pts.second.size() == 2)   // if feature Tracked in both images
         {
             f_per_fra.rightObservation(id_pts.second[1].second);
             assert(id_pts.second[1].first == 1);
         }
 
         int feature_id = id_pts.first;
+        //find iterator of feature using feature id
         auto it = find_if(feature.begin(), feature.end(), [feature_id](const FeaturePerId &it)
                           {
             return it.feature_id == feature_id;
-                          });
+                          });   // lambda 
 
-        if (it == feature.end())
+        if (it == feature.end())  // new features not in the container
         {
-            feature.push_back(FeaturePerId(feature_id, frame_count));
-            feature.back().feature_per_frame.push_back(f_per_fra);
+            feature.push_back(FeaturePerId(feature_id, frame_count));   // save feature id with frame number => start_frame
+            feature.back().feature_per_frame.push_back(f_per_fra);      // save xyz_uv_vel, time
             new_feature_num++;
         }
         else if (it->feature_id == feature_id)
         {
             it->feature_per_frame.push_back(f_per_fra);
             last_track_num++;
-            if( it-> feature_per_frame.size() >= 4)
+            if( it-> feature_per_frame.size() >= 4) //tracked from 4 or more images
                 long_track_num++;
         }
     }
@@ -97,8 +98,9 @@ bool FeatureManager::addFeatureCheckParallax(int frame_count, const map<int, vec
 
     for (auto &it_per_id : feature)
     {
-        if (it_per_id.start_frame <= frame_count - 2 &&
+        if (it_per_id.start_frame <= frame_count - 2 && //frame difference of 2 or more
             it_per_id.start_frame + int(it_per_id.feature_per_frame.size()) - 1 >= frame_count - 1)
+            //If the feature has been continuously tracked since it was discovered
         {
             parallax_sum += compensatedParallax2(it_per_id, frame_count);
             parallax_num++;
@@ -113,8 +115,8 @@ bool FeatureManager::addFeatureCheckParallax(int frame_count, const map<int, vec
     {
         ROS_DEBUG("parallax_sum: %lf, parallax_num: %d", parallax_sum, parallax_num);
         ROS_DEBUG("current parallax: %lf", parallax_sum / parallax_num * FOCAL_LENGTH);
-        last_average_parallax = parallax_sum / parallax_num * FOCAL_LENGTH;
-        return parallax_sum / parallax_num >= MIN_PARALLAX;
+        last_average_parallax = parallax_sum / parallax_num * FOCAL_LENGTH; //why calculate?
+        return parallax_sum / parallax_num >= MIN_PARALLAX; // return false when avg_parallax smaller than MIN_PARALLAX
     }
 }
 
@@ -530,7 +532,7 @@ void FeatureManager::removeFront(int frame_count)
 double FeatureManager::compensatedParallax2(const FeaturePerId &it_per_id, int frame_count)
 {
     //check the second last frame is keyframe or not
-    //parallax betwwen seconde last frame and third last frame
+    //parallax between second last frame and third last frame
     const FeaturePerFrame &frame_i = it_per_id.feature_per_frame[frame_count - 2 - it_per_id.start_frame];
     const FeaturePerFrame &frame_j = it_per_id.feature_per_frame[frame_count - 1 - it_per_id.start_frame];
 
@@ -556,7 +558,7 @@ double FeatureManager::compensatedParallax2(const FeaturePerId &it_per_id, int f
     double u_i_comp = p_i_comp(0) / dep_i_comp;
     double v_i_comp = p_i_comp(1) / dep_i_comp;
     double du_comp = u_i_comp - u_j, dv_comp = v_i_comp - v_j;
-
+    //comp ??????????????????????
     ans = max(ans, sqrt(min(du * du + dv * dv, du_comp * du_comp + dv_comp * dv_comp)));
 
     return ans;

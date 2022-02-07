@@ -269,7 +269,7 @@ map<int, vector<pair<int, Eigen::Matrix<double, 7, 1>>>> FeatureTracker::trackIm
         double x, y ,z;
         x = cur_un_pts[i].x;
         y = cur_un_pts[i].y;
-        z = 1; //normalized image plane?
+        z = 1;                  //normalized image plane?
         double p_u, p_v;
         p_u = cur_pts[i].x;     // image plane
         p_v = cur_pts[i].y;
@@ -302,7 +302,7 @@ map<int, vector<pair<int, Eigen::Matrix<double, 7, 1>>>> FeatureTracker::trackIm
 
             Eigen::Matrix<double, 7, 1> xyz_uv_velocity;
             xyz_uv_velocity << x, y, z, p_u, p_v, velocity_x, velocity_y;
-            featureFrame[feature_id].emplace_back(camera_id,  xyz_uv_velocity); // left image랑 겹치는 부분 있는 것 같은데 무슨 원리인지 다시 보기
+            featureFrame[feature_id].emplace_back(camera_id,  xyz_uv_velocity); // By using a map, the same features are stored in the same vector.
         }
     }
 

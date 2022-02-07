@@ -63,5 +63,6 @@
         "string": "cpp",
         "string_view": "cpp",
         "dense": "cpp"
-    }
+    },
+    "cmake.configureOnOpen": false
 }

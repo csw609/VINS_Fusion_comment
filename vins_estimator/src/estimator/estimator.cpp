@@ -276,7 +276,7 @@ void Estimator::processMeasurements()
         //printf("process measurments\n");
         pair<double, map<int, vector<pair<int, Eigen::Matrix<double, 7, 1> > > > > feature;
         vector<pair<double, Eigen::Vector3d>> accVector, gyrVector;
-        if(!featureBuf.empty())
+        if(!featureBuf.empty()) // If you have features that contain xyz_uv_vel 
         {
             feature = featureBuf.front();
             curTime = feature.first + td;
@@ -309,9 +309,9 @@ void Estimator::processMeasurements()
                     double dt;
                     // calculate dt each case
                     if(i == 0)
-                        dt = accVector[i].first - prevTime;
+                        dt = accVector[i].first - prevTime;     // first
                     else if (i == accVector.size() - 1)
-                        dt = curTime - accVector[i - 1].first;
+                        dt = curTime - accVector[i - 1].first;  // last
                     else
                         dt = accVector[i].first - accVector[i - 1].first;   //IMU sampling interval
                     processIMU(accVector[i].first, dt, accVector[i].second, gyrVector[i].second); 
@@ -319,6 +319,7 @@ void Estimator::processMeasurements()
                 }
             }
             mProcess.lock();
+            //feature.first => time that image received, feature.second => xyz_uv_vel
             processImage(feature.second, feature.first);
             prevTime = curTime;
 
@@ -419,14 +420,14 @@ void Estimator::processImage(const map<int, vector<pair<int, Eigen::Matrix<doubl
 {
     ROS_DEBUG("new image coming ------------------------------------------");
     ROS_DEBUG("Adding feature points %lu", image.size());
-    if (f_manager.addFeatureCheckParallax(frame_count, image, td))
+    if (f_manager.addFeatureCheckParallax(frame_count, image, td)) //calculate parallax and determines whether it is a keyframe.
     {
-        marginalization_flag = MARGIN_OLD;
+        marginalization_flag = MARGIN_OLD;  // MARGIN_OLD = 0 => keyframe
         //printf("keyframe\n");
     }
     else
     {
-        marginalization_flag = MARGIN_SECOND_NEW;
+        marginalization_flag = MARGIN_SECOND_NEW;   // MARGIN_SECOND_NEW = 1 => non-keyframe
         //printf("non-keyframe\n");
     }
 
