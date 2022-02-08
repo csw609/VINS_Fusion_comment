@@ -303,12 +303,12 @@ void FeatureManager::initFramePoseByPnP(int frameCnt, Vector3d Ps[], Matrix3d Rs
 
 void FeatureManager::triangulate(int frameCnt, Vector3d Ps[], Matrix3d Rs[], Vector3d tic[], Matrix3d ric[])
 {
-    for (auto &it_per_id : feature)
+    for (auto &it_per_id : feature) //every feature
     {
-        if (it_per_id.estimated_depth > 0)
+        if (it_per_id.estimated_depth > 0)  // already calculated
             continue;
 
-        if(STEREO && it_per_id.feature_per_frame[0].is_stereo)
+        if(STEREO && it_per_id.feature_per_frame[0].is_stereo)  // use stereo && feature tracked both images
         {
             int imu_i = it_per_id.start_frame;
             Eigen::Matrix<double, 3, 4> leftPose;

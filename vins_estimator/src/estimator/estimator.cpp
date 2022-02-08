@@ -436,10 +436,10 @@ void Estimator::processImage(const map<int, vector<pair<int, Eigen::Matrix<doubl
     ROS_DEBUG("number of feature: %d", f_manager.getFeatureCount());
     Headers[frame_count] = header;
 
-    ImageFrame imageframe(image, header);
-    imageframe.pre_integration = tmp_pre_integration;
-    all_image_frame.insert(make_pair(header, imageframe));
-    tmp_pre_integration = new IntegrationBase{acc_0, gyr_0, Bas[frame_count], Bgs[frame_count]};
+    ImageFrame imageframe(image, header); // image => feature xyz_uv_vel, header => time image received
+    imageframe.pre_integration = tmp_pre_integration; // IntegrationBase
+    all_image_frame.insert(make_pair(header, imageframe));  // map<double, ImageFrame>
+    tmp_pre_integration = new IntegrationBase{acc_0, gyr_0, Bas[frame_count], Bgs[frame_count]};// anonymous object
 
     if(ESTIMATE_EXTRINSIC == 2)
     {
@@ -461,7 +461,7 @@ void Estimator::processImage(const map<int, vector<pair<int, Eigen::Matrix<doubl
 
     if (solver_flag == INITIAL)
     {
-        // monocular + IMU initilization
+        // monocular + IMU initialization
         if (!STEREO && USE_IMU)
         {
             if (frame_count == WINDOW_SIZE)
@@ -488,7 +488,7 @@ void Estimator::processImage(const map<int, vector<pair<int, Eigen::Matrix<doubl
         // stereo + IMU initilization
         if(STEREO && USE_IMU)
         {
-            f_manager.initFramePoseByPnP(frame_count, Ps, Rs, tic, ric);
+            f_manager.initFramePoseByPnP(frame_count, Ps, Rs, tic, ric); // estimate pose using cv::solvePnP 자세히는 나중에
             f_manager.triangulate(frame_count, Ps, Rs, tic, ric);
             if (frame_count == WINDOW_SIZE)
             {
