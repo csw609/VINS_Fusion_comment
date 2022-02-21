@@ -192,7 +192,7 @@ void Estimator::inputImage(double t, const cv::Mat &_img, const cv::Mat &_img1) 
         featureBuf.push(make_pair(t, featureFrame));
         mBuf.unlock();
         TicToc processTime;
-        processMeasurements();
+        processMeasurements();  // preintegrate IMU, estimate pose using image feature, optimize graph
         printf("process time: %f\n", processTime.toc());
     }
     
@@ -320,7 +320,7 @@ void Estimator::processMeasurements()
             }
             mProcess.lock();
             //feature.first => time that image received, feature.second => xyz_uv_vel
-            processImage(feature.second, feature.first);
+            processImage(feature.second, feature.first); // estimate pose & optimize graph
             prevTime = curTime;
 
             printStatistics(*this, 0);
