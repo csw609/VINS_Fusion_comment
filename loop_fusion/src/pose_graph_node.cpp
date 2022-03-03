@@ -396,12 +396,12 @@ void command()
         std::this_thread::sleep_for(dura);
     }
 }
-
+//loop fusion main function
 int main(int argc, char **argv)
 {
     ros::init(argc, argv, "loop_fusion");
     ros::NodeHandle n("~");
-    posegraph.registerPub(n);
+    posegraph.registerPub(n);   // publisher declare
     
     VISUALIZATION_SHIFT_X = 0;
     VISUALIZATION_SHIFT_Y = 0;
